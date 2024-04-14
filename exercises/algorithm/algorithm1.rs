@@ -2,16 +2,16 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
+// I AM
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
 use std::vec::*;
 
 #[derive(Debug)]
-struct Node<T> {
+struct Node<T> { // 链表节点
     val: T,
-    next: Option<NonNull<Node<T>>>,
+    next: Option<NonNull<Node<T>>>, // 指向下一个的指针
 }
 
 impl<T> Node<T> {
@@ -23,19 +23,30 @@ impl<T> Node<T> {
     }
 }
 #[derive(Debug)]
-struct LinkedList<T> {
+struct LinkedList<T> 
+where
+    T: PartialOrd+Clone,
+{
     length: u32,
     start: Option<NonNull<Node<T>>>,
     end: Option<NonNull<Node<T>>>,
+
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T> Default for LinkedList<T> 
+where
+    T: PartialOrd+Clone,
+{
     fn default() -> Self {
         Self::new()
     }
+
 }
 
-impl<T> LinkedList<T> {
+impl<T> LinkedList<T> 
+where
+    T: PartialOrd+Clone,
+{
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -44,19 +55,20 @@ impl<T> LinkedList<T> {
         }
     }
 
-    pub fn add(&mut self, obj: T) {
+    pub fn add(&mut self, obj: T) { 
         let mut node = Box::new(Node::new(obj));
         node.next = None;
-        let node_ptr = Some(unsafe { NonNull::new_unchecked(Box::into_raw(node)) });
+        let node_ptr = Some(unsafe { NonNull::new_unchecked(Box::into_raw(node)) }); // 获取新建节点的指针
+        println!("打印节点指针 {:?}",node_ptr);
         match self.end {
             None => self.start = node_ptr,
-            Some(end_ptr) => unsafe { (*end_ptr.as_ptr()).next = node_ptr },
+            Some(end_ptr) => unsafe { (*end_ptr.as_ptr()).next = node_ptr }, // 如果非空 末尾指针的下一个指向该节点
         }
-        self.end = node_ptr;
+        self.end = node_ptr; // 更新末尾指针
         self.length += 1;
     }
 
-    pub fn get(&mut self, index: i32) -> Option<&T> {
+    pub fn get(&mut self, index: i32) -> Option<&T> { // 获取链表的第index个数字
         self.get_ith_node(self.start, index)
     }
 
@@ -65,24 +77,53 @@ impl<T> LinkedList<T> {
             None => None,
             Some(next_ptr) => match index {
                 0 => Some(unsafe { &(*next_ptr.as_ptr()).val }),
-                _ => self.get_ith_node(unsafe { (*next_ptr.as_ptr()).next }, index - 1),
+                _ => self.get_ith_node(unsafe { (*next_ptr.as_ptr()).next }, index - 1), // 从下一个指针开始 取第index-1个数
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+    
+	pub fn merge(mut list_a:LinkedList<T>,mut list_b:LinkedList<T>) -> Self
 	{
-		//TODO
-		Self {
+        let mut res = Self {
             length: 0,
             start: None,
             end: None,
+        };
+        let mut indexa:i32 = 0;
+        let mut indexb:i32 = 0;
+        
+        while indexa < list_a.length as i32 || indexb <list_b.length as i32 {
+            match (list_a.get(indexa),list_b.get(indexb)) {
+                // 四种匹配模式
+                (None,None) => return res,
+                (Some(v1),None) => {
+                    res.add(v1.clone());
+                    indexa +=1;
+                },
+                (None,Some(v2)) => {
+                    res.add(v2.clone());
+                    indexb +=1;
+                },
+                (Some(v1),Some(v2)) =>{
+                    // 从小到大 小的在前面
+                    if v1 > v2 {
+                        res.add(v2.clone());
+                        indexb +=1;
+                    }else {
+                        res.add(v1.clone());
+                        indexa +=1;
+                    }
+                }
+                
+            }
         }
+        res
 	}
 }
 
 impl<T> Display for LinkedList<T>
 where
-    T: Display,
+    T: Display + PartialOrd+Clone,
 {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match self.start {
