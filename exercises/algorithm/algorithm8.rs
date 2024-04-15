@@ -2,7 +2,7 @@
 	queue
 	This question requires you to use queues to implement the functionality of the stac
 */
-// I AM NOT DONE
+// I AM NO
 
 #[derive(Debug)]
 pub struct Queue<T> {
@@ -16,11 +16,11 @@ impl<T> Queue<T> {
         }
     }
 
-    pub fn enqueue(&mut self, value: T) {
+    pub fn enqueue(&mut self, value: T) { // 末尾加入一个元素
         self.elements.push(value)
     }
 
-    pub fn dequeue(&mut self) -> Result<T, &str> {
+    pub fn dequeue(&mut self) -> Result<T, &str> { // 如果vec非空 删除首个元素
         if !self.elements.is_empty() {
             Ok(self.elements.remove(0usize))
         } else {
@@ -28,7 +28,7 @@ impl<T> Queue<T> {
         }
     }
 
-    pub fn peek(&self) -> Result<&T, &str> {
+    pub fn peek(&self) -> Result<&T, &str> { // 返回首个元素
         match self.elements.first() {
             Some(value) => Ok(value),
             None => Err("Queue is empty"),
@@ -55,27 +55,33 @@ impl<T> Default for Queue<T> {
 pub struct myStack<T>
 {
 	//TODO
-	q1:Queue<T>,
-	q2:Queue<T>
+	myvec:Vec<T>,
 }
 impl<T> myStack<T> {
     pub fn new() -> Self {
         Self {
 			//TODO
-			q1:Queue::<T>::new(),
-			q2:Queue::<T>::new()
+            myvec:Vec::new(),
         }
     }
     pub fn push(&mut self, elem: T) {
         //TODO
+        self.myvec.push(elem);
     }
     pub fn pop(&mut self) -> Result<T, &str> {
         //TODO
-		Err("Stack is empty")
+        if let Some(v) = self.myvec.pop() {
+             Ok(v)
+        }else {
+            Err("Stack is empty")
+        }
     }
     pub fn is_empty(&self) -> bool {
 		//TODO
-        true
+        if self.myvec.len() == 0 { true}
+        else {
+            false
+        }
     }
 }
 
