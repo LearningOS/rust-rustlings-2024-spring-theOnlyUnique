@@ -2,7 +2,7 @@
 	graph
 	This problem requires you to implement a basic graph functio
 */
-// I AM NOT DONE
+// I AM NO
 
 use std::collections::{HashMap, HashSet};
 use std::fmt;
@@ -28,20 +28,30 @@ impl Graph for UndirectedGraph {
     fn adjacency_table(&self) -> &HashMap<String, Vec<(String, i32)>> {
         &self.adjacency_table
     }
-    fn add_edge(&mut self, edge: (&str, &str, i32)) {
-        //TODO
-    }
+    // fn add_edge(&mut self, edge: (&str, &str, i32)) { 直接不重写
+    //     //TODO
+    // }
 }
 pub trait Graph {
     fn new() -> Self;
-    fn adjacency_table_mutable(&mut self) -> &mut HashMap<String, Vec<(String, i32)>>;
-    fn adjacency_table(&self) -> &HashMap<String, Vec<(String, i32)>>;
+    fn adjacency_table_mutable(&mut self) -> &mut HashMap<String, Vec<(String, i32)>>; // 这个那可变的邻接表
+    fn adjacency_table(&self) -> &HashMap<String, Vec<(String, i32)>>; // 这个是只读
     fn add_node(&mut self, node: &str) -> bool {
         //TODO
-		true
+		if self.adjacency_table_mutable().contains_key(node) {
+            return false;
+        }
+        self.adjacency_table_mutable().insert(node.to_string(),Vec::new());
+        true
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
         //TODO
+        self.add_node(edge.0);
+        self.add_node(edge.1);
+        
+        self.adjacency_table_mutable().get_mut(edge.0).unwrap().push((edge.1.to_string(),edge.2));// 无向图写两遍
+        self.adjacency_table_mutable().get_mut(edge.1).unwrap().push((edge.0.to_string(),edge.2));
+        
     }
     fn contains(&self, node: &str) -> bool {
         self.adjacency_table().get(node).is_some()
@@ -51,11 +61,13 @@ pub trait Graph {
     }
     fn edges(&self) -> Vec<(&String, &String, i32)> {
         let mut edges = Vec::new();
+        println!("{:?}",self.adjacency_table());
         for (from_node, from_node_neighbours) in self.adjacency_table() {
             for (to_node, weight) in from_node_neighbours {
                 edges.push((from_node, to_node, *weight));
             }
         }
+        println!("{:?}",edges);
         edges
     }
 }
