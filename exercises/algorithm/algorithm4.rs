@@ -3,7 +3,7 @@
 	This problem requires you to implement a basic interface for a binary tree
 */
 
-//I AM NOT DONE
+//I AM NOT
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
@@ -41,7 +41,7 @@ where
 
 impl<T> BinarySearchTree<T>
 where
-    T: Ord,
+    T: Ord + Clone,
 {
 
     fn new() -> Self {
@@ -50,13 +50,39 @@ where
 
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
+        let v = value.clone();
         //TODO
+        if self.search(v) == true {
+            return ;
+        }
+        // 如果一个二叉搜索树指向的根节点为空
+        if self.root.is_none() {
+            // 将数据插入到根节点
+            self.root.replace(Box::new(TreeNode {
+                value,
+                left:None,
+                right:None,
+            }));
+        }
+        else {
+            // 否则递归 指向的最末端的TreeNode进行insert 这里我直接往一边插入
+            // as_derf_mut 获取Box包裹的TreeNode
+            self.root.as_deref_mut().unwrap().insert(value);
+        }
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
         //TODO
-        true
+        let mut new_ptr = &self.root;
+        while let Some(x) = new_ptr {
+            if (x.value == value ){
+                return true;
+            }else {
+                new_ptr = &x.right;
+            }
+        }
+        false
     }
 }
 
@@ -67,6 +93,17 @@ where
     // Insert a node into the tree
     fn insert(&mut self, value: T) {
         //TODO
+        // 往最右边找 找到None就插入
+        match &mut self.right {
+            Some(ref mut r) => r.insert(value),
+            None => {
+                self.right.replace(Box::new(TreeNode {
+                    value,
+                    left:None,
+                    right:None,
+                }));
+            }
+        }
     }
 }
 

@@ -3,7 +3,7 @@
 	This problem requires you to implement a basic BFS algorithm
 */
 
-//I AM NOT DONE
+//I AM NOT 
 use std::collections::VecDeque;
 
 // Define a graph
@@ -19,18 +19,44 @@ impl Graph {
         }
     }
 
-    // Add an edge to the graph
+    // Add an edge to the graph 无向图的节点  这里实际上是一个邻接表
     fn add_edge(&mut self, src: usize, dest: usize) {
         self.adj[src].push(dest); 
         self.adj[dest].push(src); 
     }
 
-    // Perform a breadth-first search on the graph, return the order of visited nodes
+    // Perform a breadth-firste sarch on the graph, return the order of visited nodes
     fn bfs_with_return(&self, start: usize) -> Vec<usize> {
         
 		//TODO
-
+        // 新增一个遍历队列
+        let mut taskQueue = VecDeque::new();
+        // 结果数组
         let mut visit_order = vec![];
+        // usize具有copy trait
+        // visit_order.push(start);  // 将开始节点编号加入
+        taskQueue.push_back(start);// 将开始节点编号加入队列
+        // 开始bfs
+        loop {
+            let items = taskQueue.pop_front();// 找到队首元素编号
+            if let Some(item) = items {
+                if !visit_order.contains(&item) {
+                    visit_order.push(item); // 将节点编号加入
+                }
+                // 获取该节点的邻居
+                let near_element:Vec<usize> = self.adj[item].clone().iter()
+                                    .filter(|t| !(&visit_order).contains(t))
+                                    .map(|element| (*element).clone())
+                                    .collect();
+                // 将邻居加入双端队列
+                for i in near_element {
+                    taskQueue.push_back(i.clone())
+                }
+            }else {
+                break; // pop不出来有用的东西
+            }
+        }
+
         visit_order
     }
 }
